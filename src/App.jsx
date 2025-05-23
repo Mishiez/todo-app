@@ -2,11 +2,10 @@ import TodoList from './components/TodoList';
 
 function App() {
   return (
-    <div className="App">
-      <TodoList />
-      <h1 className="text-4xl font-bold text-blue-600 underline">
-        Tailwind CSS is working!
-      </h1>
+    <div className="min-h-screen bg-gradient-to-b from-purple-500 via-blue-400 to-orange-600 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm bg-white/80 rounded-xl shadow-lg overflow-hidden backdrop-blur-sm">
+        <TodoList />
+      </div>
     </div>
   );
 }
