@@ -1,0 +1,30 @@
+query GetProjectTasks {
+  retrieveProjectTasks {
+    id
+    name
+    description
+    status
+  }
+}
+
+mutation CreateTodo($args: CreateProjectTaskInput!) {
+  createProjectTask(args: $args) {
+    id
+    name
+    description
+    status
+  }
+}
+
+mutation UpdateTodo($args: UpdateProjectTaskInput!) {
+  updateProjectTask(args: $args) {
+    id
+    name
+    description
+    status
+  }
+}
+
+mutation DeleteTodo($taskId: Int!) {
+  deleteProjectTask(taskId: $taskId)
+}

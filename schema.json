@@ -1,0 +1,793 @@
+"""Exposes a URL that specifies the behavior of this scalar."""
+directive @specifiedBy(
+  """The URL that specifies the behavior of this scalar."""
+  url: String!
+) on SCALAR
+
+"""
+
+Creating a project
+
+"""
+input CreateProjectInput {
+  name: String!
+  description: String = null
+  dateDue: String = null
+  membersUserIds: [Int!] = null
+}
+
+"""
+
+Creating a project task
+
+"""
+input CreateProjectTaskInput {
+  projectId: Int!
+  name: String!
+  description: String = null
+  dateDue: String = null
+  assignedMembersUserIds: [Int!] = null
+}
+
+"""
+
+Creating a user
+
+"""
+input CreateUserInput {
+  email: String!
+  phoneNumber: String = null
+  firstName: String = null
+  lastName: String = null
+  middleName: String = null
+  permissions: [UserPermission!]
+}
+
+type FileUpload {
+  id: Int!
+  fileName: String!
+  fileSize: Int!
+  fileExtension: String
+  category: String!
+  storageKey: String!
+  isEncrypted: Boolean!
+  dateCreated: String
+}
+
+type FileUploadFolder {
+  id: Int!
+  name: String!
+  description: String
+  dateCreated: String
+  files: [FileUpload!]!
+}
+
+"""
+
+Result of login
+
+"""
+type LoginResult {
+  user: User
+  message: String
+  jwtToken: String
+}
+
+type Message {
+  id: Int!
+  message: String!
+  sender: User
+  receiver: User
+  project: Project
+  projectTask: ProjectTask
+  dateCreated: String
+  deliveredTo: [User!]!
+  readBy: [User!]!
+}
+
+type Mutation {
+  """
+  
+          Creates a new user, done by an administrator
+          Args:
+              args : User details
+          
+  """
+  createUser(args: CreateUserInput!): User!
+
+  """
+  
+          Logs in a user into the system
+          Args:
+              email : the user's email address
+              password : The user's password
+          
+  """
+  login(email: String!, password: String!): LoginResult!
+
+  """
+  
+          Changes a user's password
+          Args:
+              oldPassword : the current password
+              newPassword : the new password to set
+          
+  """
+  changePassword(oldPassword: String!, newPassword: String!): Boolean!
+
+  """
+  
+          Resets a user's password, in case of forgotten password
+          Args:
+              email : The user account email address
+              resetToken : If they've already received a reset token
+              password : The new password to change to, if reset token already received
+          
+  """
+  resetPassword(email: String = null, resetToken: String = null, password: String = null): String!
+
+  """
+  
+          Updates a user account personal details
+          Args:
+              args : The details to update
+          
+  """
+  updateUser(args: UpdateUserInput!): User!
+
+  """
+  
+          Suspends a user from their account, done by an administrator
+          Args:
+              userId : ID of the user to suspend
+          
+  """
+  suspendUser(userId: Int!): User!
+
+  """
+  
+          Unsuspends a user from their account, done by an administrator
+          Args:
+              userId : ID of the user to unsuspend
+          
+  """
+  unsuspendUser(userId: Int!): User!
+
+  """
+  
+          Deletes a user account, done by an administrator
+          Args:
+              userId : ID of the user to delete
+          
+  """
+  deleteUser(userId: Int!): Boolean!
+
+  """
+  
+          Sets permissions for a particular user account, done by an administrator
+          Args:
+              userId : ID of the user to suspend
+              permissions : The permissions to set
+          
+  """
+  setUserPermissions(userId: Int!, permissions: [UserPermission!]!): User!
+
+  """
+  
+          Creates a new project, done by a user with the relevant permission
+          Args:
+              args : The projects details
+          
+  """
+  createProject(args: CreateProjectInput!): Project!
+
+  """
+  
+          Updates details about a project, done by its creator
+          Args:
+              args : The project details to update
+          
+  """
+  updateProject(args: UpdateProjectInput!): Project!
+
+  """
+  
+          Sets the members of a particular project, done by its creator
+          Args:
+              projectId : ID of the project
+              userIds : IDs of the users to set as members
+          
+  """
+  setProjectMembers(projectId: Int!, userIds: [Int!]!): Project!
+
+  """
+  
+          Updates a projects status, done by its creator or member
+          Args:
+              projectsId : ID of the project
+              status : The status to set
+          
+  """
+  setProjectStatus(projectId: Int!, status: ProjectStatus!): Project!
+
+  """
+  
+          Creates a folder for files related to a project, done by its creator or member
+          Args:
+              projectId : ID of the project
+              name : Name of the folder
+              description : Description of the folder
+          
+  """
+  createProjectFolder(projectId: Int!, name: String!, description: String = null): Project!
+
+  """
+  
+          Updates a folder related to a project, done by its creator or member
+          Args:
+              projectId : ID of the project
+              folderId : ID of the folder to update
+              name : Name of the folder
+              description : Description of the folder
+          
+  """
+  updateProjectFolder(projectId: Int!, folderId: Int!, name: String = null, description: String = null): Project!
+
+  """
+  
+          Deletes a folder related to a project, done by its creator or member
+          Args:
+              projectId : ID of the project
+              folderId : ID of the folder to delete
+          
+  """
+  deleteProjectFolder(projectId: Int!, folderId: Int!): Boolean!
+
+  """
+  
+          Deletes a file related to a project, done by its creator or member
+          Args:
+              projectId : ID of the project
+              folderId : ID of the folder of the file
+              fileUploadId : ID of the file to delete
+          
+  """
+  deleteProjectFile(projectId: Int!, folderId: Int!, fileUploadId: Int!): Boolean!
+
+  """
+  
+          Deletes a project entirely, done by its creator
+          Args:
+              projectId : ID of the project to delete
+          
+  """
+  deleteProject(projectId: Int!): Boolean!
+
+  """
+  
+          Creates a resource link for a particular project
+          Args:
+              projectId : ID of the project
+              name : Name of the resource link
+              url : Locator for the resource link
+              description : Description of the resource link
+          
+  """
+  createProjectResourceLink(projectId: Int!, name: String!, url: String!, description: String = null): Project!
+
+  """
+  
+          Updates a resource link details for a particular project
+          Args:
+              projectId : ID of the project
+              linkId : ID of the resource link
+              name : Name of the resource link
+              url : Locator for the resource link
+              description : Description of the resource link
+          
+  """
+  updateProjectResourceLink(projectId: Int!, linkId: Int!, name: String = null, url: String = null, description: String = null): Project!
+
+  """
+  
+          Deletes a resource link for a certain project
+          Args:
+              projectId : ID of the related project
+              linkId : ID of the resource link
+          
+  """
+  deleteProjectResourceLink(projectId: Int!, linkId: Int!): Boolean!
+
+  """
+  
+          Creates a task for a project
+          Args:
+              args : Details about the task
+          
+  """
+  createProjectTask(args: CreateProjectTaskInput!): ProjectTask!
+
+  """
+  
+          Updates details of a project task
+          Args:
+              args : Details to update of the project task
+          
+  """
+  updateProjectTask(args: UpdateProjectTaskInput!): ProjectTask!
+
+  """
+  
+          Assigns members to a project task
+          Args:
+              taskId : ID of the task
+              userIds : IDs of the users to assign
+          
+  """
+  setProjectTaskAssignedMembers(taskId: Int!, userIds: [Int!]!): ProjectTask!
+
+  """
+  
+          Updates the status of a project task
+          Args:
+              taskId : ID of the project task
+              status : The status of the task
+          
+  """
+  setProjectTaskStatus(taskId: Int!, status: ProjectTaskStatus!): ProjectTask!
+
+  """
+  
+          Creates a file folder for a particular project task
+          Args:
+              taskId : ID of the project task
+              name : Name of the folder
+              description : Description of the folder
+          
+  """
+  createProjectTaskFolder(taskId: Int!, name: String!, description: String = null): ProjectTask!
+
+  """
+  
+          Updates details about a project task
+          Args:
+              taskId : ID of the project task
+              folderId : ID of the folder to update
+              name : Name of the folder
+              description : Description of the folder
+          
+  """
+  updateProjectTaskFolder(taskId: Int!, folderId: Int!, name: String = null, description: String = null): ProjectTask!
+
+  """
+  
+          Deletes a folder for a project task
+          Args:
+              taskId : ID of the project task
+              folderId : ID of the folder to delete
+          
+  """
+  deleteProjectTaskFolder(taskId: Int!, folderId: Int!): Boolean!
+
+  """
+  
+          Deletes a file linked to a project task
+          Args:
+              taskId : ID of the project task
+              folderId : ID of the folder of the file
+              fileUploadId : ID of the file to delete
+          
+  """
+  deleteProjectTaskFile(taskId: Int!, folderId: Int!, fileUploadId: Int!): Boolean!
+
+  """
+  
+          Deletes a project task entirely
+          Args:
+              taskId : ID of the project task
+          
+  """
+  deleteProjectTask(taskId: Int!): Boolean!
+
+  """
+  
+          Creates a resource link for a project task
+          Args:
+              taskId : ID of the project task
+              name : Name of the resource link
+              url : Locator for the resource
+              description : description of the resource link
+          
+  """
+  createProjectTaskResourceLink(taskId: Int!, name: String!, url: String!, description: String = null): ProjectTask!
+
+  """
+  
+          Updates details for a resource link for a project task
+          Args:
+              taskId : ID of the project task
+              linkId : ID of the resource link
+              name : Name of the resource link
+              url : Locator for the resource
+              description : description of the resource link
+          
+  """
+  updateProjectTaskResourceLink(taskId: Int!, linkId: Int!, name: String = null, url: String = null, description: String = null): ProjectTask!
+
+  """
+  
+          Deletes a projects task's resource link
+          Args:
+              taskId : ID of the project task
+              linkId : ID of the resource link
+          
+  """
+  deleteProjectTaskResourceLink(taskId: Int!, linkId: Int!): Boolean!
+
+  """
+  
+          Sends a message, to a project board or individual user
+          Args:
+              message : The message text
+              receiverUserId : ID of the receiver, if individual
+              projectId : ID of the project, if group message
+          
+  """
+  sendMessage(message: String!, receiverUserId: Int = null, projectId: Int = null): Message!
+
+  """
+  
+          Marks messages as delivered to the acting user
+          Args:
+              messageIds : IDs of the messages to mark as delivered
+          
+  """
+  markMessagesAsDelivered(messageIds: [Int!]!): Boolean!
+
+  """
+  
+          Marks messages as read by the acting user
+          Args:
+              messageIds : IDs of the messages to mark as read
+          
+  """
+  markMessagesAsRead(messageIds: [Int!]!): Boolean!
+
+  """
+  
+          Marks messages as deleted by the acting user
+          Args:
+              messageIds : IDs of the messages to mark as deleted
+          
+  """
+  deleteMessages(messageIds: [Int!]!): Boolean!
+
+  """
+  
+          Marks a user's notifications a read
+          Args:
+              notificationIds : IDs of the notifications to mark as read
+          
+  """
+  markNotificationsAsRead(notificationIds: [Int!]!): Boolean!
+
+  """
+  
+          Deletes a user's notifications
+          Args:
+              notificationIds : IDs of the notifications to delete
+          
+  """
+  deleteNotifications(notificationIds: [Int!]!): Boolean!
+}
+
+type Notification {
+  id: Int!
+  user: User
+  title: String!
+  details: String!
+  isRead: Boolean!
+  dateCreated: String
+}
+
+type Project {
+  id: Int!
+  name: String!
+  description: String!
+  creator: User
+  status: ProjectStatus!
+  dateCreated: String
+  members: [User!]!
+  folders: [FileUploadFolder!]!
+  resourceLinks: [ResourceLink!]!
+  dateDue: String
+  dateStarted: String
+  dateArchived: String
+  dateCompleted: String
+}
+
+"""
+
+Project statuses
+
+"""
+enum ProjectStatus {
+  PENDING
+  ONGOING
+  ARCHIVED
+  COMPLETED
+}
+
+type ProjectTask {
+  id: Int!
+  name: String!
+  description: String!
+  creator: User
+  project: Project
+  status: ProjectStatus!
+  dateCreated: String
+  assignedMembers: [User!]!
+  folders: [FileUploadFolder!]!
+  resourceLinks: [ResourceLink!]!
+  dateDue: String
+  dateStarted: String
+  dateArchived: String
+  dateCompleted: String
+}
+
+"""
+
+Project task statuses
+
+"""
+enum ProjectTaskStatus {
+  PENDING
+  ONGOING
+  ARCHIVED
+  COMPLETED
+}
+
+type Query {
+  """
+  
+          retrieves the current user's profile information
+          
+  """
+  myProfile: User
+
+  """
+  
+          Fetches an individual user
+          Args:
+              userId : ID of the user to fetch
+          
+  """
+  retrieveUser(userId: Int!): User
+
+  """
+  
+          Fetches existing users
+          Args:
+              search : term to search for in name or email
+              userIds : IDs of specific users to fetch
+              excludeIds : IDs of users to filter out
+              offset : query offset
+              limit : Maximum items to fetch
+          
+  """
+  retrieveUsers(search: String = null, userIds: [Int!] = null, excludeIds: [Int!] = null, offset: Int = 0, limit: Int = 100): [User!]!
+
+  """
+  
+          Fetches an individual project
+          Args:
+              projectId : ID of the project to fetch
+          
+  """
+  retrieveProject(projectId: Int!): Project
+
+  """
+  
+          Fetches existing projects
+          Args:
+              search : term to search for in name
+              projectIds : IDs of specific projects to fetch
+              excludeIds : IDs of projects to filter out
+              status : Project status filter
+              offset : query offset
+              limit : Maximum items to fetch
+          
+  """
+  retrieveProjects(search: String = null, projectIds: [Int!] = null, excludeIds: [Int!] = null, status: ProjectStatus = null, offset: Int = 0, limit: Int = 100): [Project!]!
+
+  """
+  
+              Fetches folders for a particular project
+              Args:
+                  projectId : ID of the related project
+                  search : term to search for in name
+                  folderIds : IDs of the specific folders to fetch
+                  excludeIds : IDs of the specific folders to filter out
+                  offset : Query offset
+                  limit : Max number of items to fetch
+              
+  """
+  retrieveProjectFolders(projectId: Int!, search: String = null, folderIds: [Int!] = null, excludeIds: [Int!] = null, offset: Int = 0, limit: Int = 100): [FileUploadFolder!]!
+
+  """
+  
+              Fetches resource links for a particular project
+              Args:
+                  projectId : ID of the related project
+                  search : term to search for in name or url
+                  linkIds : IDs of the specific links to fetch
+                  excludeIds : IDs of the specific links to filter out
+                  offset : Query offset
+                  limit : Max number of items to fetch
+              
+  """
+  retrieveProjectResourceLinks(projectId: Int!, search: String = null, linkIds: [Int!] = null, excludeIds: [Int!] = null, offset: Int = 0, limit: Int = 100): [ResourceLink!]!
+
+  """
+  
+          Fetches an individual project task
+          Args:
+              taskId : ID of the task to fetch
+          
+  """
+  retrieveProjectTask(taskId: Int!): ProjectTask
+
+  """
+  
+          Fetches existing project tasks
+          Args:
+              search : term to search for in name
+              projectId : project filter
+              taskIds : IDs of the specific tasks to fetch
+              excludeIds : IDs of the tasks to filter out
+              status : Status filter
+              offset : Query offset
+              limit : Max number of items to fetch
+          
+  """
+  retrieveProjectTasks(search: String = null, projectId: Int = null, taskIds: [Int!] = null, excludeIds: [Int!] = null, status: ProjectTaskStatus = null, offset: Int = 0, limit: Int = 100): [ProjectTask!]!
+
+  """
+  
+              Fetches folders for a particular project task
+              Args:
+                  taskId : ID of the project task
+                  search : term to search for in name
+                  folderIds : IDs of the specific folders to fetch
+                  excludeIds : IDs of the specific folders to filter out
+                  offset : Query offset
+                  limit : Max number of items to fetch
+              
+  """
+  retrieveProjectTaskFolders(taskId: Int!, search: String = null, folderIds: [Int!] = null, excludeIds: [Int!] = null, offset: Int = 0, limit: Int = 100): [FileUploadFolder!]!
+
+  """
+  
+              Fetches resource links for a particular project task
+              Args:
+                  taskId : ID of the project task
+                  search : term to search for in name or url
+                  linkIds : IDs of the specific links to fetch
+                  excludeIds : IDs of the specific links to filter out
+                  offset : Query offset
+                  limit : Max number of items to fetch
+              
+  """
+  retrieveProjectTaskResourceLinks(taskId: Int!, search: String = null, linkIds: [Int!] = null, excludeIds: [Int!] = null, offset: Int = 0, limit: Int = 100): [ResourceLink!]!
+
+  """
+  
+          Fetches existing messages related to the acting user
+          Args:
+              peerUserId : receiver filter
+              projectId : Project filter
+              search : term to search for in message
+              isRead : read by filter
+              isDelivered : delivered to filter
+              afterDate : date filter, lower end
+              beforeDate : date filter, higher end
+              messageIds : IDs of specific items to fetch
+              excludeIds : IDs of items to filter out
+              offset : Query offset
+              limit : Max number of items to filter
+          
+  """
+  retrieveMessages(peerUserId: Int = null, projectId: Int = null, search: String = null, isRead: Boolean = null, isDelivered: Boolean = null, afterDate: String = null, beforeDate: String = null, messageIds: [Int!] = null, excludeIds: [Int!] = null, offset: Int = 0, limit: Int = 100): [Message!]!
+
+  """
+  
+          Fetches the acting users notifications
+          Args:
+              search : term to search for in title or details
+              isRead : read by filter
+              afterDate : date filter, lower end
+              beforeDate : date filter, higher end
+              notificationIds : IDs of specific items to fetch
+              excludeIds : IDs of items to filter out
+              offset : Query offset
+              limit : Max number of items to filter
+          
+  """
+  retrieveNotifications(notificationIds: [Int!] = null, excludeIds: [Int!] = null, search: String = null, isRead: Boolean = null, afterDate: String = null, beforeDate: String = null, offset: Int = 0, limit: Int = 100): [Notification!]!
+}
+
+type ResourceLink {
+  id: Int!
+  name: String!
+  description: String
+  url: String!
+  dateCreated: String
+}
+
+"""
+
+Updating a project
+
+"""
+input UpdateProjectInput {
+  projectId: Int!
+  name: String = null
+  description: String = null
+  dateDue: String = null
+}
+
+"""
+
+Updating a project task
+
+"""
+input UpdateProjectTaskInput {
+  taskId: Int!
+  name: String = null
+  description: String = null
+  dateDue: String = null
+}
+
+"""
+
+Updating a user
+
+"""
+input UpdateUserInput {
+  userId: Int!
+  email: String = null
+  phoneNumber: String = null
+  firstName: String = null
+  lastName: String = null
+  middleName: String = null
+}
+
+type User {
+  id: Int!
+  firstName: String!
+  lastName: String!
+  middleName: String!
+  email: String!
+  phoneNumber: String!
+  emailVerified: Boolean!
+  phoneNumberVerified: Boolean!
+  isSuspended: Boolean!
+  isActive: Boolean!
+  profilePicture: FileUpload
+  dateCreated: String
+  dateSuspended: String
+  dateUnsuspended: String
+  permissions: [UserPermission!]!
+}
+
+"""
+
+User permissions
+
+"""
+enum UserPermission {
+  MANAGE_USERS
+  MANAGE_PROJECTS
+  MANAGE_PROJECT_TASKS
+}
+
