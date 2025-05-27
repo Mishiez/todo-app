@@ -1,12 +1,17 @@
-schema: http://127.0.0.1:8000/graphql
+overwrite: true
+schema: "http://127.0.0.1:8000/graphql/"  # Your GraphQL API endpoint
 documents: "src/**/*.graphql"
 generates:
-  src/generated/graphql.tsx:
+  src/gql/graphql.tsx:
     plugins:
-      - typescript
-      - typescript-operations
-      - typescript-react-apollo
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
     config:
       withHooks: true
       withHOC: false
       withComponent: false
+      exportFragmentSpreadSubTypes: true
+      documentMode: graphQLTag
+      dedupeFragments: true
+      reactApolloVersion: 3
